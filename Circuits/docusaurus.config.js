@@ -77,15 +77,12 @@ const config = {
         },
         items: [
           {
-            href: '/docs/category/documentation',
+            type: 'docSidebar',
+            sidebarId: 'tutorialSidebar',
+            position: 'left',
             label: 'Docs',
-            position: 'left',
           },
-          {
-            href: '/docs/category/guides',
-            label: 'Guides',
-            position: 'left',
-          },
+          {to: '/blog', label: 'Blog', position: 'left'},
           {
             href: 'https://github.com/RR-Circuits/RecRoom-Circuits',
             label: 'GitHub',
@@ -121,6 +118,10 @@ const config = {
           {
             title: 'More',
             items: [
+              {
+                label: 'Blog',
+                to: '/blog',
+              },
               {
                 label: 'GitHub',
                 href: 'https://github.com/RR-Circuits/RecRoom-Circuits',

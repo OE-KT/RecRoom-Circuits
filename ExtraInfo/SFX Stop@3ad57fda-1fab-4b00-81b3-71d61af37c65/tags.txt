@@ -1,1 +1,1 @@
-Object,SFX
+Chip

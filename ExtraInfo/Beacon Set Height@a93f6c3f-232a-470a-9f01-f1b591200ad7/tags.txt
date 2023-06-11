@@ -1,1 +1,1 @@
-Object,Beacon
+Chip

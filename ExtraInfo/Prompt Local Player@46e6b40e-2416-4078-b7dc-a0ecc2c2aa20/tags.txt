@@ -1,1 +1,1 @@
-Player,UI
+Chip

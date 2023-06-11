@@ -1,1 +1,1 @@
-Object,Text
+Chip

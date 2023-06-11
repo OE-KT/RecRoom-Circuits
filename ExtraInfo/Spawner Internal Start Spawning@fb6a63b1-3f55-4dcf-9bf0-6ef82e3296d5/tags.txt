@@ -1,1 +1,1 @@
-Object,Spawner
+Chip

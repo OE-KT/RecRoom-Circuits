@@ -1,1 +1,1 @@
-Variable,Primitive,String
+Chip

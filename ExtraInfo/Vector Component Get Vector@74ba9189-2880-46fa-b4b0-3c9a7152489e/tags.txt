@@ -1,1 +1,1 @@
-Object,Vector Component
+Chip

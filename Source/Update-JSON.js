@@ -1,11 +1,9 @@
-const { error } = require("console")
 const fs = require("fs-extra")
-const { join } = require("path")
 const { exit } = require("process")
 const https = require('follow-redirects').https
 var SVGGen = ""
 
-const TotalSteps = 5
+const TotalSteps = 6
 var CurrentStep = 0
 
 const GuidesCat = {
@@ -185,13 +183,12 @@ function PrepareFiles() {
                     if (err) console.log("error");
                 })
                 fs.writeFileSync(DirPath.concat("/extrainfo.mdx"), ExtraInfoTemplate, { flag: "wx" })
-                
+                fs.writeFileSync(DirPath.concat("/tags.txt"), "Chip", { flag: "wx" })
                // fs.writeFileSync(__dirname + '/../ExtraInfo/'.concat(contents["ChipName"].replace("<", "[").replace(">", "]"), "@", uuid, ".md"), ExtraInfoTemplate, { flag: "wx" })
             } catch (error) {
                 
             }
         }
-        fs.writeFileSync(DirPath.concat("/tags.txt"), contents["Tags"].join(","))
 
         var NewChipFile = ChipTemplate
         var InputsStr = "| Input Name | Input Type |\n|-----------|-----------|"
@@ -203,12 +200,12 @@ function PrepareFiles() {
                 let newstr = ""
                 if(prt["IsUnion"] === true) {
                     var joined = prt["DataType"].join(" , ")
-                    newstr = "Any (".concat(joined, ")")
+                    newstr = "Union(".concat(joined, ")")
                 } else {
                     newstr = prt["DataType"]
                 }
                 if (prt["IsList"]) {
-                    newstr = "List&lt".concat(newstr, "&gt")
+                    newstr = "List[".concat(newstr, "]")
                 }
                 if (prt["Name"] == "") {
                     prt["Name"] = "*No name.*"
@@ -238,10 +235,9 @@ function PrepareFiles() {
         }
         
         NewChipFile = NewChipFile
-        .replace("._chipname", contents["PaletteName"]/*.replace("<", "[").replace(">", "]")*/)
+        .replace("._chipname", contents["PaletteName"].replace("<", "[").replace(">", "]"))
         .replace("._istroll", BoolToYesNo(contents["TrollingRisk"]))
         .replace("._isbeta", BoolToYesNo(contents["IsBeta"]))
-        .replace("._isrole", BoolToYesNo(contents["IsRoleAssignmentRisk"]))
         .replace("._uuid1", uuid).replace("._uuid2", uuid).replace("._uuid3", uuid)
         .replace("._inputs", InputsStr)
         .replace("._outputs", OutputsStr)
@@ -263,7 +259,7 @@ function PrepareFiles() {
                 break;
         }
         if(contents["Description"] !== "") {
-            NewChipFile = NewChipFile.replace("._chipdesc", contents["Description"].replace("<", "&lt").replace(">", "&gt"))
+            NewChipFile = NewChipFile.replace("._chipdesc", contents["Description"].replace("<", "[").replace(">", "]"))
         } else NewChipFile = NewChipFile.replace("._chipdesc", "*No description.*")
 
         fs.writeFileSync(__dirname + '/../Circuits/docs/documentation/chips/'.concat(uuid, ".mdx"), NewChipFile);
@@ -284,12 +280,8 @@ function TranslateChipData(){
         var ThisChipModel = "Default"
         if (chipd["ReadonlyPaletteName"] == "Comment" || chipd["ReadonlyPaletteName"].toLowerCase().includes("variable")){
             ThisChipModel = "Variable"
-        } else if (chipd["ReadonlyPaletteName"].toLowerCase().includes("constant") || chipd["ReadonlyPaletteName"] == "Player World UI") {
+        } else if (chipd["ReadonlyPaletteName"].toLowerCase().includes("constant")) {
             ThisChipModel = "Constant"
-        }
-        let t = [] 
-        for (const pth of chipd["NodeFilters"]) {
-            t = t.concat(pth["FilterPath"])
         }
         const thischip = NewChips[uuid] = {
             ChipName: chipd["ReadonlyChipName"],
@@ -300,9 +292,7 @@ function TranslateChipData(){
             //
             IsBeta: chipd["IsBetaChip"],
             TrollingRisk: chipd["IsTrollingRisk"],
-            IsRoleAssignmentRisk: chipd["IsRoleAssignmentRisk"],
-            DeprecationStage: chipd["DeprecationStage"],
-            Tags: t
+            DeprecationStage: chipd["DeprecationStage"]
         }
         for(const NodeDesc of chipd["NodeDescs"]){
             const TempPortAssign = {}
@@ -396,39 +386,23 @@ function RestOfUpdate(){
     OldJSON_Clone = JSON.parse(oldJSON_raw)["Nodes"]
     entries = Object.entries(OldJSON_Clone)
     
-    try {
-        AddStep("Updating ports.json...")
-        RetrievePorts();
-        fs.writeFileSync("Generated/ports.json", JSON.stringify(PortTypes, null, 4))
+    AddStep("Updating ports.json...")
+    RetrievePorts();
+    fs.writeFileSync("Generated/ports.json", JSON.stringify(PortTypes, null, 4))
 
-        AddStep("Translating chips...")
-        TranslateChipData();
-        fs.writeFileSync("Generated/chips.json", JSON.stringify(NewChips, null, 4))
-    }
-    catch (err) {
-        console.error(err)
-        console.log("Something went wrong! Can't skip important steps!")
-        exit(1)
-    }
-    try {
-        SVGGen = require("./Create-SVG")
-        AddStep("Preparing page files...")
-        PrepareFiles();
-    }
-    catch (err) {
-        console.error(err)
-        console.log("Couldn't create doc files!")
-    }
-    try {
-        AddStep("Copying docs...")
-        PrepareDocs();
-    }
-    catch (err) {
-        console.error(err)
-        console.log("Unable to clone docs!")
-    }
+    AddStep("Translating chips...")
+    TranslateChipData();
+    fs.writeFileSync("Generated/chips.json", JSON.stringify(NewChips, null, 4))
 
+    AddStep("Generating info.txt...")
+    fs.writeFileSync("Generated/info.txt", "Generated on " + new Date(Date.now()).toDateString())
     
+    SVGGen = require("./Create-SVG")
+    AddStep("Preparing page files...")
+    PrepareFiles();
+
+    AddStep("Copying docs...")
+    PrepareDocs();
 
     console.log("Finished!")
     exit(0)

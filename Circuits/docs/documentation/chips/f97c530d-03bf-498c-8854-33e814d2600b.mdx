@@ -1,8 +1,9 @@
 ---
 sidebar_position: 268
-tags: [Physics,Player,Physics,Object,Physics]
-title: 'Velocity Set'
+tags: [Chip]
 ---
+
+# Velocity Set
 
 Momentarily sets the velocity of the input target in the input direction. The input velocity will be multiplied by the magnitude of the vector provided in the input direction.
 
@@ -15,7 +16,7 @@ import EsbSvg from "./assets/f97c530d-03bf-498c-8854-33e814d2600b.svg";
 | Input Name | Input Type |
 |-----------|-----------|
 | Set Velocity | exec |
-| Target | Any (player , rec room object) |
+| Target | Union(player , rec room object) |
 | Speed (m/s) | float |
 | Direction | vector3 |
 
@@ -36,10 +37,6 @@ import EsbSvg from "./assets/f97c530d-03bf-498c-8854-33e814d2600b.svg";
         </tr>
         <tr>
           <th>Is this chip a trolling risk?</th>
-          <th>❌</th>
-        </tr>
-        <tr>
-          <th>Is this chip a role assignment risk?</th>
           <th>❌</th>
         </tr>
         <tr>

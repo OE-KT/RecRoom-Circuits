@@ -1,1 +1,1 @@
-Object,Laser Pointer
+Chip

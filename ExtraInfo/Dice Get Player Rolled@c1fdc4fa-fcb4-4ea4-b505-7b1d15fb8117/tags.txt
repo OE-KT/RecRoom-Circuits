@@ -1,1 +1,1 @@
-Object,Dice
+Chip
